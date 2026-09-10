@@ -397,6 +397,14 @@ static int _s2mu106_muic_sel_path(struct s2mu106_muic_data *muic_data,
 	reg_val1 = s2mu106_i2c_read_byte(muic_data->i2c, S2MU106_REG_MANUAL_SW_CTRL);
 	reg_val2 = reg_val1 & ~(S2MU106_DM_SWITCHING_MASK | S2MU106_DP_SWITCHING_MASK);
 
+#if IS_ENABLED(CONFIG_SAMSUNG_PRODUCT_SHIP)
+	if ((path_data == S2MU106_PATH_UART_AP ||
+		path_data == S2MU106_PATH_UART_CP)) {
+		pr_info("%s: UART path blocked in ship mode, set COM_OPEN\n", __func__);
+		path_data = S2MU106_PATH_OPEN;
+	}
+#endif
+
 #if IS_ENABLED(CONFIG_HICCUP_CHARGER)
 	if (muic_data->is_hiccup_mode)
 		reg_val2 |= S2MU106_MANSW_UART2_MASK;
